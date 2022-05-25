@@ -1,37 +1,27 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
-import { Blog, IblogData } from './components/blog';
-import { addDatatoTable, getDataFromTable, IblogDataDB } from './services/DBService';
+import { Blog } from './components/blog';
+import { InputForm } from './components/inputForm';
+import { getAllDataFromTable, IblogData } from './services/DBService';
 
 function App() {
-  const [blogDatas, setblogDatas] = useState<IblogData[]>([
-    {name: "Christian", text: "Jeg kan godt lige kage"},
-    {name: "Mis (Min kat)", text: "Mere mad"}
-  ]);
+  const [blogDatas, setblogDatas] = useState<IblogData[]>([]);
 
-  const handleClick = () => {
-    let data: IblogDataDB = {
-      name: 'Christian',
-      text: 'Jeg kan godt lige kage'
-    }
-
-    addDatatoTable(data);
+  const loadData = () => {
+    getAllDataFromTable().then(data => setblogDatas(data));
   }
 
-  const handleGetClick = async () => {
-    let data: IblogDataDB | undefined = await getDataFromTable(1);
-
-    console.log(data);
-  }
+  useEffect(() => {
+    loadData();
+  })
 
   return (
     <div className="App">
-      <button onClick={handleClick}>Add Data</button>
-      <button onClick={handleGetClick}>Get Data</button>
+      <InputForm />
       <div className="content">
         <h1>Hej med dig</h1>
         {blogDatas.map((data) => (
-          <Blog blogData={data}/>
+          <Blog key={data.id} blogData={data}/>
         ))}
       </div>
     </div>

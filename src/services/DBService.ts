@@ -3,7 +3,7 @@ import { DBSchema, openDB } from 'idb';
 const DATABASE_NAME = 'SERVICE_ORDERS';
 const DATABASE_VERSION = 2;
 
-export interface IblogDataDB {
+export interface IblogData {
 	id?: number;
 	name: string;
 	text: string;
@@ -12,7 +12,7 @@ export interface IblogDataDB {
 interface IMyDB extends DBSchema {
 	blogData: {
 		key: number;
-		value: IblogDataDB
+		value: IblogData
 	};
 }
 
@@ -31,6 +31,14 @@ export async function getDataFromTable(key: number) {
 	return (await dbPromise).get('blogData', key);
 }
 
-export async function addDatatoTable(data: IblogDataDB) {
+export async function getAllDataFromTable() {
+	return await (await dbPromise).getAll('blogData');
+}
+
+export async function addDatatoTable(data: IblogData) {
 	await (await dbPromise).add('blogData', data);
 }
+
+export async function delDatatoTable(key: number) {
+	return (await dbPromise).delete('blogData', key);
+};
