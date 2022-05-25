@@ -1,25 +1,36 @@
-import idb from 'idb';
+import { DBSchema, openDB } from 'idb';
 
 const DATABASE_NAME = 'SERVICE_ORDERS';
 const DATABASE_VERSION = 2;
-const TABLE_NAME = "My_table";
 
+export interface IblogDataDB {
+	id?: number;
+	name: string;
+	text: string;
+}
 
-const dbPromise = idb.openDB(DATABASE_NAME, DATABASE_VERSION, {
+interface IMyDB extends DBSchema {
+	blogData: {
+		key: number;
+		value: IblogDataDB
+	};
+}
+
+const dbPromise = openDB<IMyDB>(DATABASE_NAME, DATABASE_VERSION, {
 	upgrade(db) {
 		
-		if(db.objectStoreNames.contains(TABLE_NAME))
+		if(db.objectStoreNames.contains('blogData'))
 			return;
 
-		db.createObjectStore(TABLE_NAME, { autoIncrement: true, keyPath: 'id'});
+		db.createObjectStore('blogData', { autoIncrement: true, keyPath: 'id'});
 	}
 });
 
 
 export async function getDataFromTable(key: number) {
-	return (await dbPromise).get<any>(TABLE_NAME, key);
+	return (await dbPromise).get('blogData', key);
 }
 
-export async function addDatatoTable(data: any) {
-	await (await dbPromise).add(TABLE_NAME, data);
+export async function addDatatoTable(data: IblogDataDB) {
+	await (await dbPromise).add('blogData', data);
 }
